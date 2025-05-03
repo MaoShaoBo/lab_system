@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qfedu.labsystem.dao.RoleMapper">
+    <select id="getRoleList" resultType="com.qfedu.labsystem.pojo.Role">
+        SELECT
+            id,roleName,roleType,rights
+        FROM roles
+    </select>
+
+
+    <update id="updateRolelist">
+        UPDATE roles
+        <set>
+            <if test="roleName!=null">
+                roleName = #{roleName},
+            </if>
+            <if test="rights!=null">
+                rights = #{rights},
+            </if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteRoleList">
+        DELETE from roles where id = #{id}
+    </delete>
+
+    <insert id="addRoleList" parameterType="com.qfedu.labsystem.pojo.Role">
+        insert into roles
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="roleName!=null">
+                roleName,
+            </if>
+            <if test="rights!=null">
+                rights,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="roleName!=null">
+                #{roleName},
+            </if>
+            <if test="rights!=null">
+                #{rights},
+            </if>
+        </trim>
+    </insert>
+</mapper>

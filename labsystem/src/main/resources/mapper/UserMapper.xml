@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qfedu.labsystem.dao.UserMapper">
+    <select id="getUserList" resultMap="result">
+        SELECT
+            id,username,roleId,is_default,stuId,stuCollege,stuClass
+        FROM  users
+        <where>
+            <if test="username!=null and username!=''">
+                and username like concat('%',#{username},'%')
+            </if>
+            <if test="roleId!=null and roleId!=''">
+                and roleId = #{roleId}
+            </if>
+        </where>
+    </select>
+
+    <resultMap id="result" type="com.qfedu.labsystem.pojo.User">
+        <id column="id" property="id"></id>
+        <result column="username" property="username"></result>
+        <result column="roleId" property="roleId"></result>
+        <result column="is_default" property="is_default"></result>
+        <result column="stuId" property="stuId"></result>
+        <result column="stuCollege" property="stuCollege"></result>
+        <result column="stuClass" property="stuClass"></result>
+        <association property="role" select="getRole" column="roleId" javaType="com.qfedu.labsystem.pojo.Role">
+
+        </association>
+    </resultMap>
+
+    <select id="getRole" resultType="com.qfedu.labsystem.pojo.Role">
+        SELECT *
+        FROM roles
+        where id = #{any_id}
+    </select>
+
+
+    <insert id="addUserList" parameterType="com.qfedu.labsystem.pojo.User">
+        insert into users
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="username!=null">
+                username,
+            </if>
+            <if test="password!=null">
+                password,
+            </if>
+            <if test="roleId!=null">
+                roleId,
+            </if>
+            <if test="stuId!=null">
+                stuId,
+            </if>
+            <if test="stuCollege!=null">
+                stuCollege,
+            </if>
+            <if test="stuClass!=null">
+                stuClass,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="username!=null">
+                #{username},
+            </if>
+            <if test="password!=null">
+                #{password},
+            </if>
+            <if test="roleId!=null">
+                #{roleId},
+            </if>
+            <if test="stuId!=null">
+                #{stuId},
+            </if>
+            <if test="stuCollege!=null">
+                #{stuCollege},
+            </if>
+            <if test="stuClass!=null">
+                #{stuClass},
+            </if>
+        </trim>
+    </insert>
+
+
+    <update id="updateUserList">
+        update users
+        <set>
+            <if test="username!=null">
+                username = #{username},
+            </if>
+            <if test="password!=null">
+                password = #{password},
+            </if>
+            <if test="roleId!=null">
+                roleId = #{roleId},
+            </if>
+            stuId = #{stuId},
+            <if test="stuCollege!=null">
+                stuCollege = #{stuCollege},
+            </if>
+            stuClass = #{stuClass}
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteUserList">
+        delete from users where id = #{id}
+    </delete>
+</mapper>

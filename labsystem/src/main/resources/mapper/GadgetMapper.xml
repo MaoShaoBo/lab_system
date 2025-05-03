@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qfedu.labsystem.dao.GadgetMapper">
+
+    <select id="getGadgetList" resultType="com.qfedu.labsystem.pojo.Gadget">
+        SELECT *
+        FROM gadget
+        ORDER BY id ASC
+    </select>
+
+    <insert id="addGadget" parameterType="com.qfedu.labsystem.pojo.Gadget">
+        insert into gadget
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="title!=null">
+                title,
+            </if>
+            <if test="num!=null">
+                num,
+            </if>
+            <if test="lab!=null">
+                lab,
+            </if>
+            <if test="facturer!=null">
+                facturer,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="title!=null">
+                #{title},
+            </if>
+            <if test="num!=null">
+                #{num},
+            </if>
+            <if test="lab!=null">
+                #{lab},
+            </if>
+            <if test="facturer!=null">
+                #{facturer},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateGadget">
+        update gadget
+        <set>
+            <if test="title!=null">
+                title = #{title},
+            </if>
+            <if test="num!=null">
+                num = #{num},
+            </if>
+            <if test="lab!=null">
+                lab = #{lab},
+            </if>
+            <if test="facturer!=null">
+                facturer = #{facturer},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteGadget">
+        delete from gadget where id = #{id}
+    </delete>
+
+</mapper>
