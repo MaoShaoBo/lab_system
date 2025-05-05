@@ -31,4 +31,5 @@ public class GadgetServiceImpl implements GadgetService{
     public void deleteGadget(Integer id) {
         gadgetMapper.deleteGadget(id);
     }
+
 }

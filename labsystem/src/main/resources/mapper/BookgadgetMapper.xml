@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qfedu.labsystem.dao.BookgadgetMapper">
+    <resultMap id="result" type="com.qfedu.labsystem.pojo.Bookgadget">
+        <id property="id" column="id"/>
+        <result property="gadget_id" column="gadget_id"/>
+        <result property="bookgadget_time" column="bookgadget_time"/>
+        <result property="bookgadget_class" column="bookgadget_class"/>
+        <result property="bookgadget_username" column="bookgadget_username"/>
+        <result property="bookgadget_reason" column="bookgadget_reason"/>
+        <result property="bookgadget_state" column="bookgadget_state"/>
+        <association property="gadget" javaType="com.qfedu.labsystem.pojo.Gadget">
+            <id property="id" column="g_id"/>
+            <result property="title" column="g_title"/>
+            <result property="num" column="g_num"/>
+            <result property="lab" column="g_lab"/>
+            <result property="facturer" column="g_facturer"/>
+        </association>
+    </resultMap>
+
+    <insert id="addBookgadget">
+        insert into bookgadget(gadget_id, bookgadget_time, bookgadget_class, bookgadget_username, bookgadget_reason, bookgadget_state)
+        values(#{gadget_id}, #{bookgadget_time}, #{bookgadget_class}, #{bookgadget_username}, #{bookgadget_reason}, 0)
+    </insert>
+
+    <select id="getBookgadgetList" resultMap="result">
+        SELECT
+            b.*,
+            g.id as g_id,
+            g.title as g_title,
+            g.num as g_num,
+            g.lab as g_lab,
+            g.facturer as g_facturer
+        FROM bookgadget b
+        LEFT JOIN gadget g ON b.gadget_id = g.id
+        <where>
+            <if test="gadget_id!=null and gadget_id!=''">
+                and b.gadget_id = #{gadget_id}
+            </if>
+            <if test="bookgadget_time!=null">
+                and b.bookgadget_time = #{bookgadget_time}
+            </if>
+        </where>
+    </select>
+
+    <select id="getBookgadgetListByUsername" resultMap="result">
+        SELECT
+            b.*,
+            g.id as g_id,
+            g.title as g_title,
+            g.num as g_num,
+            g.lab as g_lab,
+            g.facturer as g_facturer
+        FROM bookgadget b
+        LEFT JOIN gadget g ON b.gadget_id = g.id
+        <where>
+            <if test="bookgadget_username!=null and bookgadget_username!=''">
+                and b.bookgadget_username = #{bookgadget_username}
+            </if>
+            <if test="bookgadget_state!=null">
+                and b.bookgadget_state = #{bookgadget_state}
+            </if>
+        </where>
+    </select>
+
+    <delete id="deleteBookgadget">
+        delete from bookgadget where id = #{id}
+    </delete>
+
+    <update id="updateBookgadget">
+        update bookgadget
+        <set>
+            <if test="bookgadget_state!=null">
+                bookgadget_state=#{bookgadget_state}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+</mapper>

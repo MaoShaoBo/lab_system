@@ -14,6 +14,7 @@ import GadgetList from '../views/lab-manage/GadgetList.vue'
 import AuditList from '../views/book-manage/AuditList.vue'
 import BookList from '../views/book-manage/BookList.vue'
 import AddBook from '../views/book-manage/AddBook.vue'
+import AddBookGadget from '../views/book-manage/AddBookGadget.vue'
 const routes = [
     {
         path:"/index",
@@ -54,6 +55,10 @@ const routes = [
     {
         path:"/lab-manage/gadgetlist",
         component:GadgetList
+    },
+    {
+        path:"/book-manage/addbookGadget",
+        component:AddBookGadget
     }
 ]
 

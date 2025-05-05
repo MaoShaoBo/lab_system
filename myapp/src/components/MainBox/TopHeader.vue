@@ -1,6 +1,6 @@
 <template>
     <el-header>
-        <div>实验室管理系统</div>
+        <div>基于Springboot的高校实验室管理系统</div>
         <div>
             <span style="line-height:40px;">欢迎{{ user.username }}使用</span>
             <el-dropdown>

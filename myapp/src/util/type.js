@@ -23,6 +23,14 @@ const LabType = [
     {
         label: "食品实验室",
         value: 6,
+    },
+    {
+        label: "材料实验室",
+        value: 7,
+    },
+    {
+        label: "通用实验室",
+        value: 8,
     }
 ]
 
@@ -103,6 +111,17 @@ const ClassType = [
     }
 ]
 
+const GadgetClassType = [
+    {
+        label:"上午",
+        value:1
+    },
+    {
+        label:"下午",
+        value:2
+    }
+]
+
 const Book_state_text=["审核中","已批准","被驳回"]
 const Book_state_type=["warning","success","danger"]
 
@@ -110,9 +129,9 @@ const ADMIN = 1
 const TEACHER = 2
 
 
-const AUDIT = 0;
-const APPROVE = 1;
-const REJECT  =2;
+const AUDIT = 0; //审核中
+const APPROVE = 1; //已批准
+const REJECT  =2; //被驳回
 
 export {
     LabType,
@@ -127,5 +146,6 @@ export {
     TEACHER,
     AUDIT,
     APPROVE,
-    REJECT
+    REJECT,
+    GadgetClassType
 }

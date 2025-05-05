@@ -14,12 +14,12 @@
             </el-table-column>
             <el-table-column prop="facturer" label="生产厂商"/>
 
-            <el-table-column label="预约设备">
+            <!-- <el-table-column label="预约设备">
                 <template #default="scope">
                     <el-button round type="warning" @click="handleUpdate(scope.row)"
                         >预约</el-button>
                 </template>
-            </el-table-column>
+            </el-table-column> -->
 
             <el-table-column label="操作">
                 <template #default="scope">
