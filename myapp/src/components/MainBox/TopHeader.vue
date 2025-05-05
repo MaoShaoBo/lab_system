@@ -25,7 +25,7 @@
             </div>
             <template #tip>
                 <div class="el-upload__tip">
-                    jpg/png files with a size less than 500kb
+                    jpg/png files with a size less than 5MB
                 </div>
             </template>
         </el-upload>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qfedu.labsystem.dao.HomeMapper">
+    <!-- 获取用户总数 -->
+    <select id="getUserCount" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM users
+    </select>
+
+    <!-- 获取实验室总数 -->
+    <select id="getLabCount" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM labs
+    </select>
+
+    <!-- 获取设备总数 -->
+    <select id="getGadgetCount" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM gadget
+    </select>
+
+    <!-- 获取实验室预约数据 -->
+    <select id="getLabBookData" resultType="java.util.Map">
+        SELECT 
+            l.title as labName,
+            DATE_FORMAT(b.book_time, '%Y-%m-%d') as date,
+            COUNT(*) as count
+        FROM books b
+        JOIN labs l ON b.lab_id = l.id
+        WHERE b.book_state = 1
+        AND b.book_time BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY)
+        GROUP BY l.title, b.book_time
+        ORDER BY l.title, b.book_time
+    </select>
+</mapper>
+
+

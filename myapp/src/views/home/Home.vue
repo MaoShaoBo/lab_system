@@ -1,82 +1,198 @@
 <template>
   <div>
-    <!-- 饼图容器 -->
-    <div ref="pieChartRef" style="width: 600px; height: 400px; margin-bottom: 20px;"></div>
-    
-    <!-- 柱状图容器 -->
-    <div ref="barChartRef" style="width: 600px; height: 400px;"></div>
+    <!-- 卡片样式数据 -->
+    <el-row :gutter="20" style="margin-bottom: 20px;">
+      <el-col :span="8">
+        <el-card shadow="hover">
+          <template #header>
+            <div class="card-header" style="display: flex; justify-content: center; align-items: center">
+              <span>用户总数</span>
+            </div>
+          </template>
+          <div class="card-content">
+            <span class="number">{{ userCount }}</span>
+            <span class="unit">人</span>
+          </div>
+        </el-card>
+      </el-col>
+      <el-col :span="8">
+        <el-card shadow="hover">
+          <template #header>
+            <div class="card-header" style="display: flex; justify-content: center; align-items: center">
+              <span>实验室总数</span>
+            </div>
+          </template>
+          <div class="card-content">
+            <span class="number">{{ labCount }}</span>
+            <span class="unit">间</span>
+          </div>
+        </el-card>
+      </el-col>
+      <el-col :span="8">
+        <el-card shadow="hover">
+          <template #header>
+            <div class="card-header" style="display: flex; justify-content: center; align-items: center">
+              <span>设备总数</span>
+            </div>
+          </template>
+          <div class="card-content">
+            <span class="number">{{ gadgetCount }}</span>
+            <span class="unit">台</span>
+          </div>
+        </el-card>
+      </el-col>
+    </el-row>
+
+    <!-- 实验室预约折线图 -->
+    <el-card shadow="hover">
+      <template #header>
+        <div class="card-header">
+          <span>实验室预约情况</span>
+        </div>
+      </template>
+      <div ref="lineChartRef" style="width: 100%; height: 400px;"></div>
+    </el-card>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
 import * as echarts from 'echarts';
+import axios from 'axios';
+import moment from 'moment';
 
-// 获取两个图表的 DOM 引用
-const pieChartRef = ref(null);
-const barChartRef = ref(null);
+// 卡片数据
+const userCount = ref(0);
+const labCount = ref(0);
+const gadgetCount = ref(0);
 
-onMounted(() => {
-  // 1. 初始化饼图
-  if (pieChartRef.value) {
-    const pieChart = echarts.init(pieChartRef.value);
-    const pieOption = {
-      title: {
-        text: 'Referer of a Website',
-        subtext: 'Fake Data',
-        left: 'center'
-      },
+// 折线图引用
+const lineChartRef = ref(null);
+
+// 获取卡片数据
+const getCardData = async () => {
+  try {
+    const res = await axios.get('/adminapi/home/card');
+    userCount.value = res.data.userCount;
+    labCount.value = res.data.labCount;
+    gadgetCount.value = res.data.gadgetCount;
+  } catch (error) {
+    console.error('获取卡片数据失败:', error);
+  }
+};
+
+// 获取实验室预约数据
+const getLabBookData = async () => {
+  try {
+    const res = await axios.get('/adminapi/home/labbook');
+    const data = res.data;
+    
+    // 初始化折线图
+    const lineChart = echarts.init(lineChartRef.value);
+    
+    // 生成日期数组（今天到未来7天）
+    const dates = Array.from({ length: 8 }, (_, i) => {
+      return moment().add(i, 'days').format('YYYY-MM-DD');
+    });
+
+    // 按实验室名称分组数据
+    const labGroups = {};
+    data.forEach(item => {
+      if (!labGroups[item.labName]) {
+        labGroups[item.labName] = {};
+      }
+      labGroups[item.labName][item.date] = item.count;
+    });
+
+    // 准备系列数据
+    const series = Object.keys(labGroups).map(labName => ({
+      name: labName,
+      type: 'line',
+      data: dates.map(date => labGroups[labName][date] || 0)
+    }));
+
+    // 配置项
+    const option = {
       tooltip: {
-        trigger: 'item'
+        trigger: 'axis'
       },
       legend: {
-        orient: 'vertical',
-        left: 'left'
+        data: Object.keys(labGroups),
+        type: 'scroll',
+        bottom: 0
       },
-      series: [
-        {
-          name: 'Access From',
-          type: 'pie',
-          radius: '50%',
-          data: [
-            { value: 1048, name: 'Search Engine' },
-            { value: 735, name: 'Direct' },
-            { value: 580, name: 'Email' },
-            { value: 484, name: 'Union Ads' },
-            { value: 300, name: 'Video Ads' }
-          ],
-          emphasis: {
-            itemStyle: {
-              shadowBlur: 10,
-              shadowOffsetX: 0,
-              shadowColor: 'rgba(0, 0, 0, 0.5)'
-            }
-          }
-        }
-      ]
-    };
-    pieChart.setOption(pieOption);
-  }
-
-  // 2. 初始化柱状图
-  if (barChartRef.value) {
-    const barChart = echarts.init(barChartRef.value);
-    const barOption = {
+      grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '15%',
+        containLabel: true
+      },
       xAxis: {
         type: 'category',
-        data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+        boundaryGap: false,
+        data: dates
       },
       yAxis: {
-        type: 'value'
+        type: 'value',
+        name: '预约数量',
+        min: 0,       // 最小值设为0
+        max: 4,       // 最大值设为4
+        interval: 1,  // 间隔设为1
       },
-      series: [
-        {
-          data: [120, 200, 150, 80, 70, 110, 130],
-          type: 'bar'
-        }
-      ]
+      series: series
     };
-    barChart.setOption(barOption);
+
+    lineChart.setOption(option);
+
+    // 响应式调整
+    window.addEventListener('resize', () => {
+      lineChart.resize();
+    });
+  } catch (error) {
+    console.error('获取实验室预约数据失败:', error);
   }
+};
+
+onMounted(() => {
+  getCardData();
+  getLabBookData();
 });
 </script>
+
+<style scoped>
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+}
+
+.card-content {
+  text-align: center;
+  padding: 10px 0;
+}
+
+.number {
+  font-size: 24px;
+  font-weight: bold;
+  color: #409EFF;
+}
+
+.unit {
+  font-size: 14px;
+  color: #909399;
+  margin-left: 5px;
+}
+
+.el-card {
+  margin-bottom: 15px;
+}
+
+.el-card :deep(.el-card__header) {
+  padding: 10px 15px;
+}
+
+.el-card :deep(.el-card__body) {
+  padding: 10px;
+}
+</style>

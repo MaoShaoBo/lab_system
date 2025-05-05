@@ -87,7 +87,10 @@ onMounted(() => {
     scene.on('loaded', () => {
         getList()
         scene.addLayer(imagelayer);
-
+        // 动态设置透明度
+        imagelayer.style({
+            opacity: 0.91
+        });
     });
 
 })

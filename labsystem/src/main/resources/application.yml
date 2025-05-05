@@ -19,5 +19,5 @@ mybatis:
 config:
   jwt:
     secret: kerwin_any_code
-    expire: 3600
+    expire: 36000
     header: token
