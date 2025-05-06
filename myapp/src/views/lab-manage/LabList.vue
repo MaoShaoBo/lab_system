@@ -1,16 +1,25 @@
 <template>
     <div>
-        <el-table :data="tableData" style="width: 100%">
-            <!-- <el-table-column prop="roleName" label="角色名称" width="180" /> -->
-            <!-- <el-table-column prop="icon" label="图标" width="180" /> -->
+        <el-table :data="filterTableData" style="width: 100%">
             <el-table-column label="名称">
+                <template #header>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span>名称</span>
+                        <el-input v-model="titleSearch" size="small" placeholder="请搜索" style="width: 100px;" />
+                    </div>
+                </template>
                 <template #default="scope">
                     <el-link type="primary" @click="handleLocation(scope.row)">{{ scope.row.title }}</el-link>
                 </template>
             </el-table-column>
 
-
             <el-table-column label="所属学院">
+                <template #header>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span>所属学院</span>
+                        <el-input v-model="collegeSearch" size="small" placeholder="请搜索" style="width: 100px;" />
+                    </div>
+                </template>
                 <template #default="scope">
                     <el-tag :color="CollegesColorType[scope.row.college_type]">{{ college_method(scope.row.college_type)
                     }}</el-tag>
@@ -37,14 +46,11 @@
             </el-table-column>
         </el-table>
 
-
         <el-dialog v-model="dialogVisible" title="实验室位置" :fullscreen="true" v-if="dialogVisible">
             <LabMap :x="currentItem.x" :y="currentItem.y" :t="currentItem.title"></LabMap>
         </el-dialog>
 
-
         <el-dialog v-model="dialogUpdateVisible" title="更新实验室">
-
             <el-form ref="updateFormRef" :model="updateForm" :rules="rules" label-width="100px" class="ruleForm" status-icon>
                 <el-form-item label="实验室名称" prop="title">
                     <el-input v-model="updateForm.title" />
@@ -57,14 +63,12 @@
                         style="width:100%">
                         <el-option v-for="item in LabType" :key="item.value" :label="item.label" :value="item.value" />
                     </el-select>
-
                 </el-form-item>
                 <el-form-item label="所属学院" prop="college_type">
                     <el-select v-model="updateForm.college_type" class="m-2" placeholder="请选择学院" size="large"
                         style="width:100%">
                         <el-option v-for="item in CollegeType" :key="item.value" :label="item.label" :value="item.value" />
                     </el-select>
-
                 </el-form-item>
             </el-form>
 
@@ -81,11 +85,26 @@
 </template>
 
 <script setup>
-import { ref, onMounted,reactive } from 'vue'
+import { ref, onMounted, reactive, computed } from 'vue'
 import axios from 'axios';
 import { CollegeType, LabType, LabColorType, CollegesColorType } from '../../util/type'
 import LabMap from '../../components/lab-manage/LabMap.vue'
+
 const tableData = ref([])
+const titleSearch = ref("")
+const collegeSearch = ref("")
+
+// 添加过滤后的表格数据计算属性
+const filterTableData = computed(() => {
+    return tableData.value.filter(item => {
+        const titleMatch = !titleSearch.value || 
+            item.title.toLowerCase().includes(titleSearch.value.toLowerCase())
+        const collegeMatch = !collegeSearch.value || 
+            college_method(item.college_type).toLowerCase().includes(collegeSearch.value.toLowerCase())
+        return titleMatch && collegeMatch
+    })
+})
+
 onMounted(() => {
     getList()
 })
@@ -113,7 +132,6 @@ const handleLocation = (item) => {
     currentItem.value = item
 }
 
-
 //更新
 const dialogUpdateVisible = ref(false)
 const updateFormRef = ref()
@@ -122,7 +140,6 @@ const updateForm = reactive({
     capacity: "",
     lab_type: "",
     college_type: "",
-  
 })
 const rules = reactive({
     title: [
@@ -139,31 +156,27 @@ const rules = reactive({
     ],
 })
 
-const handleUpdate = (item)=>{
+const handleUpdate = (item) => {
     dialogUpdateVisible.value = true
-
     updateForm.title = item.title
     updateForm.capacity = item.capacity
     updateForm.lab_type = item.lab_type
     updateForm.college_type = item.college_type
-
     currentItem.value = item
 }
 
-const handleUpdateConfirm  =()=>{
-    updateFormRef.value.validate(async(valid)=>{
-        if(valid){
+const handleUpdateConfirm = () => {
+    updateFormRef.value.validate(async (valid) => {
+        if (valid) {
             dialogUpdateVisible.value = false
-            // console.log(updateForm)
-            await axios.put(`/adminapi/labs/${currentItem.value.id}`,updateForm)
-
+            await axios.put(`/adminapi/labs/${currentItem.value.id}`, updateForm)
             await getList()
         }
     })
 }
 
 //删除
-const handleDelete = async({id})=>{
+const handleDelete = async ({ id }) => {
     await axios.delete(`/adminapi/labs/${id}`)
     await getList()
 }

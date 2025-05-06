@@ -2,11 +2,31 @@
     <div>
         <el-button type="primary" @click="handleAdd" style="margin-bottom: 20px;">添加设备</el-button>
 
-        <el-table :data="tableData" style="width: 100%">
-            <!-- <el-table-column prop="roleName" label="角色名称" width="180" /> -->
-            <!-- <el-table-column prop="icon" label="图标" width="180" /> -->
-            <el-table-column prop="title" label="设备名称"/>
-            <el-table-column prop="num" label="设备编号"/>
+        <el-table :data="filterTableData" style="width: 100%">
+            <el-table-column label="设备名称">
+                <template #header>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span>设备名称</span>
+                        <el-input v-model="titleSearch" size="small" placeholder="请搜索" style="width: 100px;" />
+                    </div>
+                </template>
+                <template #default="scope">
+                    <div>{{ scope.row.title }}</div>
+                </template>
+            </el-table-column>
+
+            <el-table-column label="设备编号">
+                <template #header>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span>设备编号</span>
+                        <el-input v-model="numSearch" size="small" placeholder="请搜索" style="width: 100px;" />
+                    </div>
+                </template>
+                <template #default="scope">
+                    <div>{{ scope.row.num }}</div>
+                </template>
+            </el-table-column>
+
             <el-table-column label="所属实验室">
                 <template #default="scope">
                     <div>{{ getLabName(scope.row.lab) }}</div>
@@ -14,21 +34,13 @@
             </el-table-column>
             <el-table-column prop="facturer" label="生产厂商"/>
 
-            <!-- <el-table-column label="预约设备">
-                <template #default="scope">
-                    <el-button round type="warning" @click="handleUpdate(scope.row)"
-                        >预约</el-button>
-                </template>
-            </el-table-column> -->
-
             <el-table-column label="操作">
                 <template #default="scope">
-                    <el-button round type="warning" @click="handleUpdate(scope.row)"
-                        >更新</el-button>
+                    <el-button round type="warning" @click="handleUpdate(scope.row)">更新</el-button>
                     <el-popconfirm title="你确定要删除吗?" @confirm="handleDelete(scope.row)" confirm-button-text="确定"
                         cancel-button-text="取消">
                         <template #reference>
-                            <el-button type="danger" round >删除</el-button>
+                            <el-button type="danger" round>删除</el-button>
                         </template>
                     </el-popconfirm>
                 </template>
@@ -38,7 +50,7 @@
         <!-- 添加对话框 -->
         <el-dialog v-model="dialogVisible" title="添加设备">
             <el-form ref="addFormRef" :model="addForm" :rules="rules" label-width="100px" class="ruleForm" status-icon>
-                <el-form-item label="设备名称" prop="title" >
+                <el-form-item label="设备名称" prop="title">
                     <el-input v-model="addForm.title" />
                 </el-form-item>
                 <el-form-item label="设备编号" prop="num">
@@ -107,9 +119,23 @@
 
 <script setup>
 import axios from 'axios';
-import { ref, onMounted, reactive } from 'vue'
+import { ref, onMounted, reactive, computed } from 'vue'
+
 const tableData = ref([])
 const labList = ref([])
+const titleSearch = ref("")
+const numSearch = ref("")
+
+// 添加过滤后的表格数据计算属性
+const filterTableData = computed(() => {
+    return tableData.value.filter(item => {
+        const titleMatch = !titleSearch.value || 
+            item.title.toLowerCase().includes(titleSearch.value.toLowerCase())
+        const numMatch = !numSearch.value || 
+            item.num.toLowerCase().includes(numSearch.value.toLowerCase())
+        return titleMatch && numMatch
+    })
+})
 
 onMounted(() => {
     getList()
