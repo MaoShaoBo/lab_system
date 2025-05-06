@@ -9,6 +9,7 @@
                     <el-dropdown-menu>
                         <el-dropdown-item>{{ user.role.roleName }}</el-dropdown-item>
                         <el-dropdown-item v-if="user.username === 'admin'" @click="handleUpdate">更新学校平面图</el-dropdown-item>
+                        <el-dropdown-item @click="handleChangePassword">修改密码</el-dropdown-item>
                         <el-dropdown-item @click="handleExit">退出</el-dropdown-item>
 
                     </el-dropdown-menu>
@@ -31,14 +32,35 @@
         </el-upload>
 
     </el-dialog>
+
+    <el-dialog v-model="passwordDialogVisible" title="修改密码" width="30%">
+    <el-form ref="passwordFormRef" :model="passwordForm" :rules="passwordRules" label-width="80px" class="ruleForm" status-icon>
+        <el-form-item label="新密码" prop="newPassword">
+            <el-input v-model="passwordForm.newPassword" type="password" />
+        </el-form-item>
+        <el-form-item label="确认密码" prop="confirmPassword">
+            <el-input v-model="passwordForm.confirmPassword" type="password" />
+        </el-form-item>
+    </el-form>
+    <template #footer>
+        <span class="dialog-footer">
+            <el-button @click="passwordDialogVisible = false">取消</el-button>
+            <el-button type="primary" @click="handlePasswordConfirm">
+                确定
+            </el-button>
+        </span>
+    </template>
+</el-dialog>
 </template>
 
 <script setup>
 import { useUserStore } from '../../store/useUserStore'
 import { useRouterStore } from '../../store/useRouterStore'
 import { useRouter } from 'vue-router'
-import { ref } from 'vue'
+import { ref, reactive } from 'vue'
 import { UploadFilled } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
+import axios from 'axios'
 
 const { changeUser, user } = useUserStore()
 const { changeRouter } = useRouterStore()
@@ -77,6 +99,68 @@ const data = {
 const handleSuccess = ()=>{
     dialogVisible.value = false;
     window.location.reload();
+}
+
+// 修改密码相关
+const passwordDialogVisible = ref(false)
+const passwordFormRef = ref()
+const passwordForm = reactive({
+    newPassword: "",
+    confirmPassword: ""
+})
+
+const validatePass = (rule, value, callback) => {
+    if (value === '') {
+        callback(new Error('请输入密码'))
+    } else {
+        if (passwordForm.confirmPassword !== '') {
+            passwordFormRef.value.validateField('confirmPassword')
+        }
+        callback()
+    }
+}
+
+const validatePass2 = (rule, value, callback) => {
+    if (value === '') {
+        callback(new Error('请再次输入密码'))
+    } else if (value !== passwordForm.newPassword) {
+        callback(new Error('两次输入密码不一致!'))
+    } else {
+        callback()
+    }
+}
+
+const passwordRules = reactive({
+    newPassword: [
+        { required: true, validator: validatePass, trigger: 'blur' }
+    ],
+    confirmPassword: [
+        { required: true, validator: validatePass2, trigger: 'blur' }
+    ]
+})
+
+const handleChangePassword = () => {
+    passwordDialogVisible.value = true
+}
+
+const handlePasswordConfirm = () => {
+    passwordFormRef.value.validate(async (valid) => {
+        if (valid) {
+            try {
+                await axios.put(`/adminapi/users/${user.id}`, {
+                    password: passwordForm.newPassword
+                })
+                ElMessage({
+                    message: '密码修改成功，请重新登录',
+                    type: 'success',
+                })
+                passwordDialogVisible.value = false
+                handleExit()
+            } catch (error) {
+                ElMessage.error('密码修改失败')
+            }
+        }
+    })
 }
 </script>
 
