@@ -32,4 +32,8 @@ public class GadgetServiceImpl implements GadgetService{
         gadgetMapper.deleteGadget(id);
     }
 
+    @Override
+    public List<Gadget> getGadgetListByLabId(Integer labId) {
+        return gadgetMapper.getGadgetListByLabId(labId);
+    }
 }

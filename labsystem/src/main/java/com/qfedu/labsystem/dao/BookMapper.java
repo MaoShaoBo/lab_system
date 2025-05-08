@@ -14,4 +14,6 @@ public interface BookMapper {
     void deleteBookList(Integer id);
 
     void updateBookList(Book book);
+
+    List<Book> getBookListByLabId(Integer labId);
 }

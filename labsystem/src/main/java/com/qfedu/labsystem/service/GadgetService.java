@@ -12,4 +12,6 @@ public interface GadgetService {
     void updateGadget(Gadget gadget);
     
     void deleteGadget(Integer id);
+
+    List<Gadget> getGadgetListByLabId(Integer labId);
 }

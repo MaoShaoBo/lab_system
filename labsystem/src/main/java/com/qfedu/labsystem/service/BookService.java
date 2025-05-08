@@ -9,6 +9,8 @@ public interface BookService {
 
     List<Book> getBookList(Book book);
 
+    List<Book> getBookListByLabId(Integer labId);
+
     void deleteBookList(Integer id);
 
     void updateBookList(Book book);

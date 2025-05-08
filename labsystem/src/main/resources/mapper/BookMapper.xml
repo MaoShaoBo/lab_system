@@ -100,4 +100,10 @@
         </set>
         where id = #{id}
     </update>
+
+    <select id="getBookListByLabId" resultType="com.qfedu.labsystem.pojo.Book">
+        SELECT *
+        FROM books
+        WHERE lab_id = #{labId}
+    </select>
 </mapper>

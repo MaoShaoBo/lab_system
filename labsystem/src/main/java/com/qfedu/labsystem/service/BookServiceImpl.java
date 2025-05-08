@@ -22,6 +22,11 @@ public class BookServiceImpl implements BookService{
     }
 
     @Override
+    public List<Book> getBookListByLabId(Integer labId) {
+        return bookMapper.getBookListByLabId(labId);
+    }
+
+    @Override
     public void deleteBookList(Integer id) {
         bookMapper.deleteBookList(id);
     }

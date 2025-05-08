@@ -10,6 +10,12 @@
         ORDER BY id ASC
     </select>
 
+    <select id="getGadgetListByLabId" resultType="com.qfedu.labsystem.pojo.Gadget">
+        SELECT *
+        FROM gadget
+        WHERE lab = #{labId}
+    </select>
+
     <insert id="addGadget" parameterType="com.qfedu.labsystem.pojo.Gadget">
         insert into gadget
         <trim prefix="(" suffix=")" suffixOverrides=",">

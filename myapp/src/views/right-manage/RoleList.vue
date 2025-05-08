@@ -80,6 +80,7 @@
 <script setup>
 import axios from 'axios';
 import { ref, onMounted, reactive,nextTick } from 'vue'
+import { ElMessage } from 'element-plus'
 const tableData = ref([])
 const rightlist = ref([])
 
@@ -180,8 +181,18 @@ const handleConfirm =async ()=>{
 
 //删除
 const handleDelete =async ({id})=>{
-    await axios.delete(`/adminapi/roles/${id}`)
-    await getList()
+    try {
+        const res = await axios.delete(`/adminapi/roles/${id}`)
+        if(res.data.code === -1) {
+            ElMessage.error('该角色权限下存在用户，无法删除')
+            await getList()
+        } else {
+            await getList()
+            ElMessage.success('删除成功')
+        }
+    } catch (error) {
+        ElMessage.error('删除失败')
+    }
 }
 
 const addDialogVisible = ref(false)

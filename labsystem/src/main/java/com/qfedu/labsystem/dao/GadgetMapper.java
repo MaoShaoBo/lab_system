@@ -14,4 +14,6 @@ public interface GadgetMapper {
     void updateGadget(Gadget gadget);
     
     void deleteGadget(Integer id);
+
+    List<Gadget> getGadgetListByLabId(Integer labId);
 }

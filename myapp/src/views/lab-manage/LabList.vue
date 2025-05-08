@@ -89,6 +89,7 @@ import { ref, onMounted, reactive, computed } from 'vue'
 import axios from 'axios';
 import { CollegeType, LabType, LabColorType, CollegesColorType } from '../../util/type'
 import LabMap from '../../components/lab-manage/LabMap.vue'
+import { ElMessage } from 'element-plus'
 
 const tableData = ref([])
 const titleSearch = ref("")
@@ -177,8 +178,18 @@ const handleUpdateConfirm = () => {
 
 //删除
 const handleDelete = async ({ id }) => {
-    await axios.delete(`/adminapi/labs/${id}`)
-    await getList()
+    try {
+        const res = await axios.delete(`/adminapi/labs/${id}`)
+        if(res.data.code === -1) {
+            ElMessage.error('该实验室下存在设备，无法删除')
+            await getList()
+        } else {
+            await getList()
+            ElMessage.success('删除成功')
+        }
+    } catch (error) {
+        ElMessage.error('删除失败')
+    }
 }
 </script>
 
